@@ -60,6 +60,33 @@ python gh-fetch-release.py \
 
 ```
 python gh-fetch-release.py \
+  --repo sharkdp/bat \
+  --pattern 'x86_64-unknown-linux-musl.tar.gz$' \
+  --outdir ~/bin \
+  --binfiles 'bat*/bat' \
+  --setexec
+```
+
+```
+python gh-fetch-release.py \
+  --repo aristocratos/btop \
+  --pattern 'x86_64-linux-musl.tbz$' \
+  --outdir ~/bin \
+  --binfiles 'btop/bin/btop' \
+  --setexec
+```
+
+```
+python gh-fetch-release.py \
+  --repo junegunn/fzf \
+  --pattern 'linux_amd64.tar.gz$' \
+  --outdir ~/bin \
+  --binfiles 'fzf' \
+  --setexec
+```
+
+```
+python gh-fetch-release.py \
   --repo dandavison/delta \
   --pattern 'x86_64-unknown-linux-musl\.tar\.gz$' \
   --outdir ~/bin \
