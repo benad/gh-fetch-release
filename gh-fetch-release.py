@@ -85,6 +85,10 @@ def extract_binfiles(download_filename: str, download_path: str, downloaddir: st
     class ArchiveTarGz(Archive):
         def extract(self, outdir: str) -> int:
             return os.system(f"tar -xzf {self.path} -C {outdir}")
+    
+    class ArchiveTarBz2(Archive):
+        def extract(self, outdir: str) -> int:
+            return os.system(f"tar -xjf {self.path} -C {outdir}")
 
     class ArchiveZip(Archive):
         def extract(self, outdir: str) -> int:
@@ -96,6 +100,9 @@ def extract_binfiles(download_filename: str, download_path: str, downloaddir: st
 
     archive_classes = {
         '.tar.gz': ArchiveTarGz,
+        '.tgz': ArchiveTarGz,
+        '.tar.bz2': ArchiveTarBz2,
+        '.tbz': ArchiveTarBz2,
         '.zip': ArchiveZip,
         '.tar.zst': ArchiveTarZst
     }
