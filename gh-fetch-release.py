@@ -83,6 +83,20 @@ def extract_binfiles(download_filename: str, download_path: str, downloaddir: st
         def extract(self, outdir: str) -> int:
             return os.system(f"tar -xzf {self.path} -C {outdir}")
 
+    class ArchiveBz2(Archive):
+        class temp_chdir:
+            def __init__(self, path):
+                self.new_path = path
+                self.old_path = os.getcwd()
+            def __enter__(self):
+                os.chdir(self.new_path)
+            def __exit__(self, _exc_type, _exc_val, _exc_tb):
+                os.chdir(self.old_path)
+
+        def extract(self, outdir: str) -> int:
+            with self.temp_chdir(outdir):
+                return os.system(f"bzip2 -d {self.path}")
+
     class ArchiveTarBz2(Archive):
         def extract(self, outdir: str) -> int:
             return os.system(f"tar -xjf {self.path} -C {outdir}")
@@ -100,6 +114,7 @@ def extract_binfiles(download_filename: str, download_path: str, downloaddir: st
         '.tgz': ArchiveTarGz,
         '.tar.bz2': ArchiveTarBz2,
         '.tbz': ArchiveTarBz2,
+        '.bz2': ArchiveBz2,
         '.zip': ArchiveZip,
         '.tar.zst': ArchiveTarZst
     }

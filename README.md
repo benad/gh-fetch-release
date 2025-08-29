@@ -94,6 +94,16 @@ python gh-fetch-release.py \
   --setexec
 ```
 
+```
+python gh-fetch-release.py \
+  --repo restic/restic \
+  --pattern 'linux_amd64\.bz2$' \
+  --outdir ~/bin \
+  --binfiles 'restic*' \
+  --setexec \
+  --rename restic
+```
+
 ## Background
 
 I have a bunch of Linux tools that I install in `~/bin` because either
