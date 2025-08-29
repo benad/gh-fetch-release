@@ -81,10 +81,10 @@ def extract_binfiles(download_filename: str, download_path: str, downloaddir: st
 
     class ArchiveTarGz(Archive):
         def extract(self, outdir: str) -> int:
-            return os.system(f"tar -xzf {self.path} -C {outdir}")
+            return subprocess.call(["tar", "-xzf", self.path, "-C", outdir])
 
     class ArchiveBz2(Archive):
-        class temp_chdir:
+        class TempChdir:
             def __init__(self, path):
                 self.new_path = path
                 self.old_path = os.getcwd()
@@ -94,20 +94,23 @@ def extract_binfiles(download_filename: str, download_path: str, downloaddir: st
                 os.chdir(self.old_path)
 
         def extract(self, outdir: str) -> int:
-            with self.temp_chdir(outdir):
-                return os.system(f"bzip2 -d {self.path}")
+            with self.TempChdir(outdir):
+                return subprocess.call(["bzip2", "-d", self.path])
 
     class ArchiveTarBz2(Archive):
         def extract(self, outdir: str) -> int:
-            return os.system(f"tar -xjf {self.path} -C {outdir}")
+            return subprocess.call(["tar", "-xjf", self.path, "-C", outdir])
 
     class ArchiveZip(Archive):
         def extract(self, outdir: str) -> int:
-            return os.system(f"unzip -o {self.path} -d {outdir}")
+            return subprocess.call(["unzip", "-o", self.path, "-d", outdir])
 
     class ArchiveTarZst(Archive):
         def extract(self, outdir: str) -> int:
-            return os.system(f"tar --use-compress-program=unzstd -xf {self.path} -C {outdir}")
+            return subprocess.call([
+                "tar", "--use-compress-program=unzstd", "-xf", self.path,
+                "-C", outdir
+            ])
 
     archive_classes = {
         '.tar.gz': ArchiveTarGz,
