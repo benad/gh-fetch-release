@@ -32,7 +32,8 @@ def get_cli_options() -> dict:
     parser.add_argument('--outdir', type=str, required=True,
                         help='Output directory to install the binary files.')
     parser.add_argument('--binfiles', type=str, required=True,
-                        help='Glob pattern to match the binary files to install from the extracted files')
+                        help='''Glob pattern to match the binary files to install from the extracted
+                                files''')
     parser.add_argument('--downloaddir', type=str, required=False, default=None,
                         help='''Temporary download directory (if not given, a temporary
                                 directory will be created and deleted)''')
@@ -58,7 +59,8 @@ def get_download_url(options) -> str | None:
         return None
     response = json.loads(response_data)
     if 'assets' not in response:
-        raise Exception("No assets found in the latest release.")
+        print("No assets found in the latest release.")
+        return None
     for asset in response['assets']:
         if not ( 'name' in asset and 'browser_download_url' in asset ):
             continue
@@ -67,25 +69,20 @@ def get_download_url(options) -> str | None:
             return asset['browser_download_url']
 
 def download_file(url: str, path: str) -> int:
-    try:
-        res = subprocess.call(["curl", "-L", "-o", path, url])
-    except Exception as e:
-        print(f"Error downloading file: {e}")
-        res = 1
-    return res
+    return subprocess.call(["curl", "-L", "-o", path, url])
 
 def extract_binfiles(download_filename: str, download_path: str, downloaddir: str) -> int:
     class Archive:
         def __init__(self, path: str):
             self.path = path
 
-        def extract(self, outdir: str) -> int:
+        def extract(self, _outdir: str) -> int:
             return 1 # Not implemented
 
     class ArchiveTarGz(Archive):
         def extract(self, outdir: str) -> int:
             return os.system(f"tar -xzf {self.path} -C {outdir}")
-    
+
     class ArchiveTarBz2(Archive):
         def extract(self, outdir: str) -> int:
             return os.system(f"tar -xjf {self.path} -C {outdir}")
@@ -114,14 +111,14 @@ def extract_binfiles(download_filename: str, download_path: str, downloaddir: st
             break
 
     if archive_obj is None:
-        raise Exception(f"Unsupported archive format: {download_filename}")
+        raise ValueError(f"Unsupported archive format: {download_filename}")
 
     return archive_obj.extract(downloaddir)
 
 def run(options: dict) -> None:
     url = get_download_url(options)
     if url is None:
-        raise Exception("No matching asset found in the latest release.")
+        raise RuntimeError("No matching asset found in the latest release.")
 
     downloaddir = options.get("downloaddir", None)
     temporary_dir = None
@@ -139,16 +136,18 @@ def run(options: dict) -> None:
         res = download_file(url, download_path)
 
         if res != 0:
-            raise Exception(f"Failed to download {url}")
+            raise RuntimeError(f"Failed to download {url}")
 
         print("Extracting to", downloaddir)
         res = extract_binfiles(download_filename, download_path, downloaddir)
         if res != 0:
-            raise Exception(f"Failed to extract {download_path} to {downloaddir}")
+            raise RuntimeError(f"Failed to extract {download_path} to {downloaddir}")
 
         matching_files = glob.glob(os.path.join(downloaddir, options['binfiles']))
         if len(matching_files) == 0:
-            raise Exception(f"Binary file {options['binfiles']} not found in the extracted files.")
+            raise RuntimeError(
+                f"""Binary file {options['binfiles']} not found in the extracted files."""
+            )
 
         outdir = options["outdir"]
         if not os.path.exists(outdir):
@@ -167,5 +166,5 @@ def run(options: dict) -> None:
             temporary_dir.cleanup()
 
 if __name__ == "__main__":
-    options = get_cli_options()
-    run(options)
+    cli_options = get_cli_options()
+    run(cli_options)
