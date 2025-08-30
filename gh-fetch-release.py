@@ -75,11 +75,16 @@ def extract_binfiles(download_filename: str, download_path: str, downloaddir: st
     class Archive:
         def __init__(self, path: str):
             self.path = path
-
+        @staticmethod
+        def extension() -> str:
+            return ''
         def extract(self, _outdir: str) -> int:
             return 1 # Not implemented
 
     class ArchiveTarGz(Archive):
+        @staticmethod
+        def extension() -> str:
+            return '.tar.gz'
         def extract(self, outdir: str) -> int:
             return subprocess.call(["tar", "-xzf", self.path, "-C", outdir])
 
@@ -92,39 +97,50 @@ def extract_binfiles(download_filename: str, download_path: str, downloaddir: st
                 os.chdir(self.new_path)
             def __exit__(self, _exc_type, _exc_val, _exc_tb):
                 os.chdir(self.old_path)
-
+        @staticmethod
+        def extension() -> str:
+            return '.bz2'
         def extract(self, outdir: str) -> int:
             with self.TempChdir(outdir):
                 return subprocess.call(["bzip2", "-d", self.path])
 
     class ArchiveTarBz2(Archive):
+        @staticmethod
+        def extension() -> str:
+            return '.tar.bz2'
         def extract(self, outdir: str) -> int:
             return subprocess.call(["tar", "-xjf", self.path, "-C", outdir])
 
     class ArchiveZip(Archive):
+        @staticmethod
+        def extension() -> str:
+            return '.zip'
         def extract(self, outdir: str) -> int:
             return subprocess.call(["unzip", "-o", self.path, "-d", outdir])
 
     class ArchiveTarZst(Archive):
+        @staticmethod
+        def extension() -> str:
+            return '.tar.zst'
         def extract(self, outdir: str) -> int:
             return subprocess.call([
                 "tar", "--use-compress-program=unzstd", "-xf", self.path,
                 "-C", outdir
             ])
 
-    archive_classes = {
-        '.tar.gz': ArchiveTarGz,
-        '.tgz': ArchiveTarGz,
-        '.tar.bz2': ArchiveTarBz2,
-        '.tbz': ArchiveTarBz2,
-        '.bz2': ArchiveBz2,
-        '.zip': ArchiveZip,
-        '.tar.zst': ArchiveTarZst
-    }
+    archive_classes = [
+        ArchiveTarGz,
+        ArchiveTarGz,
+        ArchiveTarBz2,
+        ArchiveBz2,
+        ArchiveZip,
+        ArchiveTarZst
+    ]
+    archive_classes.sort(key=lambda cls: -len(cls.extension()))
 
     archive_obj = None
-    for ext, cls in archive_classes.items():
-        if download_filename.endswith(ext):
+    for cls in archive_classes:
+        if download_filename.endswith(cls.extension()):
             archive_obj = cls(download_path)
             break
 
