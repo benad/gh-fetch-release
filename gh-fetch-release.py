@@ -56,7 +56,10 @@ def get_download_url(options) -> str | None:
     token_args = []
     if options.get("token", None) is not None:
         print("Using GitHub token")
-        token_args = ["-H", f"Authorization: token {options['token']}"]
+        # Validate token: GitHub tokens are usually alphanumeric with some dashes/underscores
+        if not re.fullmatch(r'[A-Za-z0-9_\-]+', options['token']):
+            raise ValueError("Invalid GitHub token format.")
+        token_args = ["-H", f"Authorization: Bearer {options['token']}"]
     try:
         response_data = subprocess.check_output(
             ["curl", "-sL", "-H", "User-Agent: python", *token_args, api_url],
