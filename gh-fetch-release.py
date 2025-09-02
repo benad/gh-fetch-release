@@ -55,6 +55,7 @@ def get_download_url(options) -> str | None:
     api_url = f"https://api.github.com/repos/{owner}/{repo}/releases/latest"
     token_args = []
     if options.get("token", None) is not None:
+        print("Using GitHub token")
         token_args = ["-H", f"Authorization: token {options['token']}"]
     try:
         response_data = subprocess.check_output(
