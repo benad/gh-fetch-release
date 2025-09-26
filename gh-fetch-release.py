@@ -17,6 +17,7 @@ import shutil
 import tempfile
 import subprocess
 import urllib.request
+import urllib.error
 
 def get_cli_options() -> dict:
     parser = argparse.ArgumentParser(
@@ -71,7 +72,7 @@ def get_download_url(options) -> str | None:
                 raise RuntimeError("GitHub API request failed with status code:" +
                                    f" {response.status} {response.reason}")
             response_data = response.read().decode(encoding='utf-8')
-    except subprocess.CalledProcessError as e:
+    except urllib.error.URLError as e:
         print(f"Error fetching release info: {e}")
         return None
     response = json.loads(response_data)
@@ -89,7 +90,7 @@ def download_file(url: str, path: str) -> int:
     try:
         urllib.request.urlretrieve(url, path)
         return 0
-    except Exception as e:
+    except (urllib.error.HTTPError, urllib.error.URLError) as e:
         print(f"Error downloading file: {e}")
         return 1
 
