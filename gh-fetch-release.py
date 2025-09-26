@@ -92,6 +92,7 @@ def extract_binfiles(download_filename: str, download_path: str, downloaddir: st
         def extract(self, _outdir: str) -> int:
             return 1 # Not implemented
 
+    # pylint: disable=possibly-unused-variable
     class ArchiveTarGz(Archive):
         @staticmethod
         def extension() -> str:
@@ -138,14 +139,11 @@ def extract_binfiles(download_filename: str, download_path: str, downloaddir: st
                 "tar", "--use-compress-program=unzstd", "-xf", self.path,
                 "-C", outdir
             ])
+    # pylint: enable=possibly-unused-variable
 
     archive_classes = [
-        ArchiveTarGz,
-        ArchiveTarGz,
-        ArchiveTarBz2,
-        ArchiveBz2,
-        ArchiveZip,
-        ArchiveTarZst
+        obj for obj in locals().values()
+        if isinstance(obj, type) and issubclass(obj, Archive) and obj is not Archive
     ]
     archive_classes.sort(key=lambda cls: -len(cls.extension()))
 
