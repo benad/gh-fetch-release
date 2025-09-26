@@ -18,7 +18,8 @@ options:
                         Temporary download directory (if not given, a temporary directory will be created and deleted)
   --setexec             Set executable permission on the installed binary files
   --rename RENAME       Set the name of the installed binary file (only if a single file is matched by --binfiles)
-```
+  --token TOKEN         GitHub token to use for authentication. Can also be set via the GITHUB_TOKEN environment variable.
+  ```
 
 Requirements:
 
@@ -103,6 +104,13 @@ python gh-fetch-release.py \
   --setexec \
   --rename restic
 ```
+
+## GitHub Token (Optional)
+
+Use: https://github.com/settings/personal-access-tokens/new
+
+Repository access: Public repositories. No need to add any permission
+under the section "Permissions".
 
 ## Background
 

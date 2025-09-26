@@ -42,6 +42,10 @@ def get_cli_options() -> dict:
     parser.add_argument('--rename', type=str, required=False, default=None,
                         help='''Set the name of the installed binary file (only if a single file is
                                 matched by --binfiles)''')
+    parser.add_argument('--token', type=str, required=False,
+                        default=os.environ.get('GITHUB_TOKEN', None),
+                        help='''GitHub token to use for authentication. Can also be set via the
+                                GITHUB_TOKEN environment variable.''')
     args = parser.parse_args()
     return vars(args)
 
@@ -49,9 +53,16 @@ def get_download_url(options) -> str | None:
     owner, repo = options['repo'].split('/')
 
     api_url = f"https://api.github.com/repos/{owner}/{repo}/releases/latest"
+    token_args = []
+    if options.get("token", None) is not None:
+        print("Using GitHub token")
+        # Validate token: GitHub tokens are usually alphanumeric with some dashes/underscores
+        if not re.fullmatch(r'[A-Za-z0-9_\-]+', options['token']):
+            raise ValueError("Invalid GitHub token format.")
+        token_args = ["-H", f"Authorization: Bearer {options['token']}"]
     try:
         response_data = subprocess.check_output(
-            ["curl", "-sL", "-H", "User-Agent: python", api_url],
+            ["curl", "-sL", "-H", "User-Agent: python", *token_args, api_url],
             text=True
         )
     except subprocess.CalledProcessError as e:
