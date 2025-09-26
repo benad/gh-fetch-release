@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 
 # MIT License
 # Copyright (c) 2025 Benoit Nadeau
@@ -16,6 +16,7 @@ import re
 import shutil
 import tempfile
 import subprocess
+import urllib.request
 
 def get_cli_options() -> dict:
     parser = argparse.ArgumentParser(
@@ -53,18 +54,23 @@ def get_download_url(options) -> str | None:
     owner, repo = options['repo'].split('/')
 
     api_url = f"https://api.github.com/repos/{owner}/{repo}/releases/latest"
-    token_args = []
+    token_headers = {}
     if options.get("token", None) is not None:
         print("Using GitHub token")
         # Validate token: GitHub tokens are usually alphanumeric with some dashes/underscores
         if not re.fullmatch(r'[A-Za-z0-9_\-]+', options['token']):
             raise ValueError("Invalid GitHub token format.")
-        token_args = ["-H", f"Authorization: Bearer {options['token']}"]
+        token_headers["Authorization"] = f"Bearer {options['token']}"
     try:
-        response_data = subprocess.check_output(
-            ["curl", "-sL", "-H", "User-Agent: python", *token_args, api_url],
-            text=True
+        request = urllib.request.Request(
+            api_url,
+            headers={"User-Agent": "python", **token_headers}
         )
+        with urllib.request.urlopen(request) as response:
+            if response.status != 200:
+                raise RuntimeError("GitHub API request failed with status code:" +
+                                   f" {response.status} {response.reason}")
+            response_data = response.read().decode(encoding='utf-8')
     except subprocess.CalledProcessError as e:
         print(f"Error fetching release info: {e}")
         return None
@@ -80,7 +86,12 @@ def get_download_url(options) -> str | None:
             return asset['browser_download_url']
 
 def download_file(url: str, path: str) -> int:
-    return subprocess.call(["curl", "-L", "-o", path, url])
+    try:
+        urllib.request.urlretrieve(url, path)
+        return 0
+    except Exception as e:
+        print(f"Error downloading file: {e}")
+        return 1
 
 def extract_binfiles(download_filename: str, download_path: str, downloaddir: str) -> int:
     class Archive:

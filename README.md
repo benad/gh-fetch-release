@@ -24,7 +24,6 @@ options:
 Requirements:
 
 - Python 3
-- `curl`
 - `tar`
 - `unzip` (optional)
 - `unzstd` (from the `zstd` package, optional)
@@ -145,6 +144,7 @@ liking for the following reasons:
 
 So I went with a simpler approach. I assume the Linux system has at least
 Python 3, `curl`, `tar` and maybe `unzip` and `unzstd`. This seems reasonable.
+(Newer versions remove the `curl` requirement.)
 And then, copy over a single-file Python script with no additional dependencies
 and run it. The script is samll enough that it could be copied over an SSH shell
 (`cat > gh-fetch-release.py`, paste, control-d).
