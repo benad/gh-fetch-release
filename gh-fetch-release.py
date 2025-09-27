@@ -90,6 +90,8 @@ def get_download_url(options) -> str | None:
         print(f"Checking asset: {asset['name']} against pattern {options['pattern']}")
         if re.search(options['pattern'], asset['name']) is not None:
             return asset['browser_download_url']
+    print('No matching asset found.')
+    return None
 
 def download_file(url: str, path: str) -> int:
     try:
