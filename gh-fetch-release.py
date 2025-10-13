@@ -23,33 +23,33 @@ import urllib.error
 
 def get_cli_options() -> dict:
     parser = argparse.ArgumentParser(
-                            prog='gh-fetch-release',
-                            description='''Fetch and extract binary files from the latest GitHub
-                            release of the given repository.''',
-                            add_help=True,
-                            allow_abbrev=True,
-                            exit_on_error=True)
-    parser.add_argument('--repo', type=str, required=True,
-                        help='GitHub repository in the form owner/repo')
-    parser.add_argument('--pattern', type=str, required=True,
-                        help='Regex pattern to match the asset filename')
-    parser.add_argument('--outdir', type=str, required=True,
-                        help='Output directory to install the binary files.')
-    parser.add_argument('--binfiles', type=str, required=True,
-                        help='''Glob pattern to match the binary files to install from the extracted
-                                files''')
-    parser.add_argument('--downloaddir', type=str, required=False, default=None,
-                        help='''Temporary download directory (if not given, a temporary
-                                directory will be created and deleted)''')
-    parser.add_argument('--setexec', action='store_true', required=False, default=False,
-                        help='Set executable permission on the installed binary files')
-    parser.add_argument('--rename', type=str, required=False, default=None,
-                        help='''Set the name of the installed binary file (only if a single file is
-                                matched by --binfiles)''')
-    parser.add_argument('--token', type=str, required=False,
-                        default=os.environ.get('GITHUB_TOKEN', None),
-                        help='''GitHub token to use for authentication. Can also be set via the
-                                GITHUB_TOKEN environment variable.''')
+        prog="gh-fetch-release",
+        description=("Fetch and extract binary files from the latest "
+                     "GitHub release of the given repository."),
+        add_help=True,
+        allow_abbrev=True,
+        exit_on_error=True)
+    parser.add_argument("--repo", type=str, required=True,
+                        help="GitHub repository in the form owner/repo")
+    parser.add_argument("--pattern", type=str, required=True,
+                        help="Regex pattern to match the asset filename")
+    parser.add_argument("--outdir", type=str, required=True,
+                        help="Output directory to install the binary files.")
+    parser.add_argument("--binfiles", type=str, required=True,
+                        help=("Glob pattern to match the binary files to install "
+                              "from the extracted files"))
+    parser.add_argument("--downloaddir", type=str, required=False, default=None,
+                        help=("Temporary download directory. If not given, a "
+                              "temporary directory will be created and deleted."))
+    parser.add_argument("--setexec", action="store_true", required=False, default=False,
+                        help="Set executable permission on the installed binary files")
+    parser.add_argument("--rename", type=str, required=False, default=None,
+                        help=("Set the name of the installed binary file. "
+                              "Only used if a single file is matched by --binfiles."))
+    parser.add_argument("--token", type=str, required=False,
+                        default=os.environ.get("GITHUB_TOKEN", None),
+                        help=("GitHub token to use for authentication. "
+                              "Can also be set via the GITHUB_TOKEN environment variable."))
     args = parser.parse_args()
     return vars(args)
 
@@ -71,8 +71,8 @@ def get_download_url(options) -> str | None:
         )
         with urllib.request.urlopen(request) as response:
             if response.status != 200:
-                raise RuntimeError("GitHub API request failed with status code:" +
-                                   f" {response.status} {response.reason}")
+                raise RuntimeError(("GitHub API request failed with status code:"
+                                   f" {response.status} {response.reason}"))
             response_data = response.read().decode(encoding='utf-8')
     except urllib.error.URLError as e:
         print(f"Error fetching release info: {e}")
@@ -205,7 +205,7 @@ def run(options: dict) -> None:
         matching_files = glob.glob(os.path.join(downloaddir, options['binfiles']))
         if len(matching_files) == 0:
             raise RuntimeError(
-                f"""Binary file {options['binfiles']} not found in the extracted files."""
+                f"Binary file {options['binfiles']} not found in the extracted files."
             )
 
         outdir = options["outdir"]
