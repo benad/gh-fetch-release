@@ -25,8 +25,9 @@ Requirements:
 
 - Python 3
 - `tar`
-- `unzip` (optional)
-- `unzstd` (from the `zstd` package, optional)
+- `bzip2` (optional, for `.bz2`, `.tbz` and `.tar.bz2` files)
+- `unzip` (optional, for `.zip` files)
+- `unzstd` (from the `zstd` package, optional, for `.tar.zst` files)
 
 Examples:
 

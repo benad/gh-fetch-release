@@ -83,6 +83,7 @@ def extract_binfiles(download_filename: str, download_path: str, downloaddir: st
         ('.tar.gz',  lambda p, d: subprocess.call(["tar", "-xzf", p, "-C", d])),
         ('.tar.bz2', lambda p, d: subprocess.call(["tar", "-xjf", p, "-C", d])),
         ('.tar.zst', lambda p, d: subprocess.call(["tar", "--use-compress-program=unzstd", "-xf", p, "-C", d])),
+        ('.tbz',     lambda p, d: subprocess.call(["tar", "-xjf", p, "-C", d])),
         ('.zip',     lambda p, d: subprocess.call(["unzip", "-o", p, "-d", d])),
         ('.bz2',     lambda p, d: subprocess.call(["bzip2", "-d", p])),
     ]
