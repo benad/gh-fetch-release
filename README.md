@@ -37,7 +37,7 @@ Examples:
 ```sh
 python gh-fetch-release.py \
   --repo microsoft/edit \
-  --pattern 'x86_64-linux-gnu\.tar\.zst$' \
+  --pattern 'edit-.*-x86_64-linux-gnu\.tar\.gz$' \
   --outdir ~/bin \
   --binfiles 'edit' \
   --setexec \
