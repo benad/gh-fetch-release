@@ -41,9 +41,11 @@ def get_cli_options() -> dict:
                         help='Set the name of the installed binary file (only if a single file is matched by --binfiles)')
     parser.add_argument('--token', type=str, default=os.environ.get('GITHUB_TOKEN'),
                         help='GitHub token to use for authentication. Can also be set via the GITHUB_TOKEN environment variable.')
+    parser.add_argument('--state-file', type=str, default=None,
+                        help='JSON file to track installed versions and skip if they did not change')
     return vars(parser.parse_args())
 
-def get_download_url(options) -> str | None:
+def get_download_url(options) -> tuple[str | None, str | None]:
     owner, repo = options['repo'].split('/')
     api_url = f"https://api.github.com/repos/{owner}/{repo}/releases/latest"
     headers = {"User-Agent": "python"}
@@ -60,15 +62,16 @@ def get_download_url(options) -> str | None:
             data = json.loads(response.read().decode())
     except urllib.error.URLError as e:
         print(f"Error fetching release info: {e}")
-        return None
+        return None, None
+    tag_name = data.get('tag_name')
     for asset in data.get('assets', []):
         if 'name' not in asset or 'browser_download_url' not in asset:
             continue
         print(f"Checking asset: {asset['name']} against pattern {options['pattern']}")
         if re.search(options['pattern'], asset['name']):
-            return asset['browser_download_url']
+            return asset['browser_download_url'], tag_name
     print('No matching asset found.')
-    return None
+    return None, tag_name
 
 def download_file(url: str, path: str) -> int:
     try:
@@ -93,9 +96,22 @@ def extract_binfiles(download_filename: str, download_path: str, downloaddir: st
     raise ValueError(f"Unsupported archive format: {download_filename}")
 
 def run(options: dict) -> None:
-    url = get_download_url(options)
+    url, tag_name = get_download_url(options)
     if url is None:
         raise RuntimeError("No matching asset found in the latest release.")
+
+    state_file = options.get("state_file")
+    state = {}
+    if state_file:
+        if os.path.exists(state_file):
+            try:
+                with open(state_file, 'r') as f:
+                    state = json.load(f)
+            except Exception as e:
+                print(f"Warning: failed to read state file: {e}")
+        if state.get(options['repo']) == tag_name:
+            print(f"Version {tag_name} is already installed. Skipping.")
+            return
 
     downloaddir = options.get("downloaddir", None)
     temporary_dir = None
@@ -133,6 +149,14 @@ def run(options: dict) -> None:
             if options.get("setexec"):
                 os.chmod(outfilepath, 0o755)
             print(f"Installed {file} as {outfilepath}")
+
+        if state_file:
+            state[options['repo']] = tag_name
+            try:
+                with open(state_file, 'w') as f:
+                    json.dump(state, f)
+            except Exception as e:
+                print(f"Warning: failed to write state file: {e}")
     finally:
         if temporary_dir is not None:
             temporary_dir.cleanup()
