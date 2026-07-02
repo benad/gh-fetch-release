@@ -101,14 +101,16 @@ def run(options: dict) -> None:
         raise RuntimeError("No matching asset found in the latest release.")
 
     state_file = options.get("state_file")
+    state_key = None
     state = {}
     if state_file:
+        state_key = f"{options['repo']}:{options['pattern']}:{options['binfiles']}"
         try:
             with open(state_file, encoding='utf-8') as f:
                 state = json.load(f)
         except FileNotFoundError:
             pass
-        if state.get(options['repo']) == tag_name:
+        if state.get(state_key) == tag_name:
             print(f"Version {tag_name} is already installed. Skipping.")
             return
 
@@ -149,8 +151,8 @@ def run(options: dict) -> None:
                 os.chmod(outfilepath, 0o755)
             print(f"Installed {file} as {outfilepath}")
 
-        if state_file:
-            state[options['repo']] = tag_name
+        if state_file and state_key:
+            state[state_key] = tag_name
             with open(state_file, 'w', encoding='utf-8') as f:
                 json.dump(state, f)
     finally:
