@@ -2,7 +2,7 @@
 
 ## Usage
 
-```
+```sh
 python3 gh-fetch-release.py [-h] --repo REPO --pattern PATTERN --outdir OUTDIR --binfiles BINFILES
                             [--downloaddir DOWNLOADDIR] [--setexec] [--rename RENAME]
                             [--token TOKEN] [--state-file STATE_FILE]
@@ -22,7 +22,7 @@ options:
   --token TOKEN         GitHub token to use for authentication. Can also be set via the GITHUB_TOKEN environment variable.
   --state-file STATE_FILE
                         JSON file to track installed versions and skip if they did not change.
-  ```
+```
 
 Requirements:
 
@@ -34,7 +34,7 @@ Requirements:
 
 Examples:
 
-```
+```sh
 python gh-fetch-release.py \
   --repo microsoft/edit \
   --pattern 'x86_64-linux-gnu\.tar\.zst$' \
@@ -44,7 +44,7 @@ python gh-fetch-release.py \
   --state-file ~/.local/gh-fetch-release-state.json
 ```
 
-```
+```sh
 python gh-fetch-release.py \
   --repo jarun/nnn \
   --pattern 'musl-static-.*\.x86_64\.tar\.gz$' \
@@ -55,7 +55,7 @@ python gh-fetch-release.py \
   --state-file ~/.local/gh-fetch-release-state.json
 ```
 
-```
+```sh
 python gh-fetch-release.py \
   --repo rclone/rclone \
   --pattern 'linux-amd64\.zip$' \
@@ -65,7 +65,7 @@ python gh-fetch-release.py \
   --state-file ~/.local/gh-fetch-release-state.json
 ```
 
-```
+```sh
 python gh-fetch-release.py \
   --repo sharkdp/bat \
   --pattern 'x86_64-unknown-linux-musl.tar.gz$' \
@@ -75,7 +75,7 @@ python gh-fetch-release.py \
   --state-file ~/.local/gh-fetch-release-state.json
 ```
 
-```
+```sh
 python gh-fetch-release.py \
   --repo aristocratos/btop \
   --pattern 'x86_64-linux-musl.tbz$' \
@@ -85,7 +85,7 @@ python gh-fetch-release.py \
   --state-file ~/.local/gh-fetch-release-state.json
 ```
 
-```
+```sh
 python gh-fetch-release.py \
   --repo junegunn/fzf \
   --pattern 'linux_amd64.tar.gz$' \
@@ -95,7 +95,7 @@ python gh-fetch-release.py \
   --state-file ~/.local/gh-fetch-release-state.json
 ```
 
-```
+```sh
 python gh-fetch-release.py \
   --repo dandavison/delta \
   --pattern 'x86_64-unknown-linux-musl\.tar\.gz$' \
@@ -105,7 +105,7 @@ python gh-fetch-release.py \
   --state-file ~/.local/gh-fetch-release-state.json
 ```
 
-```
+```sh
 python gh-fetch-release.py \
   --repo restic/restic \
   --pattern 'linux_amd64\.bz2$' \
