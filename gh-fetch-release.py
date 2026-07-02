@@ -7,7 +7,7 @@
 # Fetch and extract binary files from the latest GitHub
 # release of the given repository.
 
-# pylint: disable=missing-class-docstring,missing-function-docstring,missing-module-docstring,invalid-name
+# pylint: disable=missing-class-docstring,missing-function-docstring,missing-module-docstring,invalid-name,too-many-locals,too-many-branches,consider-using-with,line-too-long
 
 import argparse
 import glob
