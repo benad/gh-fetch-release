@@ -2,9 +2,10 @@
 
 ## Usage
 
-```
+```sh
 python3 gh-fetch-release.py [-h] --repo REPO --pattern PATTERN --outdir OUTDIR --binfiles BINFILES
                             [--downloaddir DOWNLOADDIR] [--setexec] [--rename RENAME]
+                            [--token TOKEN] [--state-file STATE_FILE]
 
 Fetch and extract binary files from the latest GitHub release of the given repository.
 
@@ -19,7 +20,9 @@ options:
   --setexec             Set executable permission on the installed binary files
   --rename RENAME       Set the name of the installed binary file (only if a single file is matched by --binfiles)
   --token TOKEN         GitHub token to use for authentication. Can also be set via the GITHUB_TOKEN environment variable.
-  ```
+  --state-file STATE_FILE
+                        JSON file to track installed versions and skip if they did not change.
+```
 
 Requirements:
 
@@ -31,78 +34,86 @@ Requirements:
 
 Examples:
 
-```
+```sh
 python gh-fetch-release.py \
   --repo microsoft/edit \
-  --pattern 'x86_64-linux-gnu\.tar\.zst$' \
+  --pattern 'edit-.*-x86_64-linux-gnu\.tar\.gz$' \
   --outdir ~/bin \
   --binfiles 'edit' \
-  --setexec
+  --setexec \
+  --state-file ~/.local/gh-fetch-release-state.json
 ```
 
-```
+```sh
 python gh-fetch-release.py \
   --repo jarun/nnn \
   --pattern 'musl-static-.*\.x86_64\.tar\.gz$' \
   --outdir ~/bin \
   --binfiles 'nnn-musl-static' \
   --setexec \
-  --rename 'nnn'
+  --rename 'nnn' \
+  --state-file ~/.local/gh-fetch-release-state.json
 ```
 
-```
+```sh
 python gh-fetch-release.py \
   --repo rclone/rclone \
   --pattern 'linux-amd64\.zip$' \
   --outdir ~/bin \
   --binfiles 'rclone-*/rclone' \
-  --setexec
+  --setexec \
+  --state-file ~/.local/gh-fetch-release-state.json
 ```
 
-```
+```sh
 python gh-fetch-release.py \
   --repo sharkdp/bat \
   --pattern 'x86_64-unknown-linux-musl.tar.gz$' \
   --outdir ~/bin \
   --binfiles 'bat*/bat' \
-  --setexec
+  --setexec \
+  --state-file ~/.local/gh-fetch-release-state.json
 ```
 
-```
+```sh
 python gh-fetch-release.py \
   --repo aristocratos/btop \
   --pattern 'x86_64-linux-musl.tbz$' \
   --outdir ~/bin \
   --binfiles 'btop/bin/btop' \
-  --setexec
+  --setexec \
+  --state-file ~/.local/gh-fetch-release-state.json
 ```
 
-```
+```sh
 python gh-fetch-release.py \
   --repo junegunn/fzf \
   --pattern 'linux_amd64.tar.gz$' \
   --outdir ~/bin \
   --binfiles 'fzf' \
-  --setexec
+  --setexec \
+  --state-file ~/.local/gh-fetch-release-state.json
 ```
 
-```
+```sh
 python gh-fetch-release.py \
   --repo dandavison/delta \
   --pattern 'x86_64-unknown-linux-musl\.tar\.gz$' \
   --outdir ~/bin \
   --binfiles 'delta-*/delta' \
-  --setexec
+  --setexec \
+  --state-file ~/.local/gh-fetch-release-state.json
 ```
 
-```
+```sh
 python gh-fetch-release.py \
   --repo restic/restic \
   --pattern 'linux_amd64\.bz2$' \
   --outdir ~/bin \
   --binfiles 'restic*' \
   --setexec \
-  --rename restic
+  --rename restic \
+  --state-file ~/.local/gh-fetch-release-state.json
 ```
 
 ## GitHub Token (Optional)
@@ -147,5 +158,5 @@ So I went with a simpler approach. I assume the Linux system has at least
 Python 3, `curl`, `tar` and maybe `unzip` and `unzstd`. This seems reasonable.
 (Newer versions remove the `curl` requirement.)
 And then, copy over a single-file Python script with no additional dependencies
-and run it. The script is samll enough that it could be copied over an SSH shell
+and run it. The script is small enough that it could be copied over an SSH shell
 (`cat > gh-fetch-release.py`, paste, control-d).
