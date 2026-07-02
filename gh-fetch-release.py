@@ -103,12 +103,11 @@ def run(options: dict) -> None:
     state_file = options.get("state_file")
     state = {}
     if state_file:
-        if os.path.exists(state_file):
-            try:
-                with open(state_file, 'r') as f:
-                    state = json.load(f)
-            except Exception as e:
-                print(f"Warning: failed to read state file: {e}")
+        try:
+            with open(state_file, encoding='utf-8') as f:
+                state = json.load(f)
+        except FileNotFoundError:
+            pass
         if state.get(options['repo']) == tag_name:
             print(f"Version {tag_name} is already installed. Skipping.")
             return
@@ -152,11 +151,8 @@ def run(options: dict) -> None:
 
         if state_file:
             state[options['repo']] = tag_name
-            try:
-                with open(state_file, 'w') as f:
-                    json.dump(state, f)
-            except Exception as e:
-                print(f"Warning: failed to write state file: {e}")
+            with open(state_file, 'w', encoding='utf-8') as f:
+                json.dump(state, f)
     finally:
         if temporary_dir is not None:
             temporary_dir.cleanup()
